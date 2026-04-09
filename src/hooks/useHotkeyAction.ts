@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import {
     HotkeyActionType,
@@ -17,10 +17,18 @@ export const useHotkeyAction = (
     actionType: HotkeyActionType,
     handler: HotkeySubscriber,
 ) => {
+    const handlerRef = useRef(handler);
+    handlerRef.current = handler;
+
     useEffect(() => {
-        const unsubscribe = hotkeyEventManager.subscribe(actionType, handler);
+        const stableHandler: HotkeySubscriber = (...args) =>
+            handlerRef.current(...args);
+        const unsubscribe = hotkeyEventManager.subscribe(
+            actionType,
+            stableHandler,
+        );
         return unsubscribe;
-    }, [actionType, handler]);
+    }, [actionType]);
 };
 
 export type { HotkeyEvent, HotkeySubscriber };

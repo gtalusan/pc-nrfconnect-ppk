@@ -449,6 +449,7 @@ const Chart = () => {
             );
             return () => {
                 clearTimeout(debounce);
+                selectionStateAbortController.current?.abort();
             };
         }
 
